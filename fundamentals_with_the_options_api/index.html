@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Shopping List App</title>
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div id="shopping-list">
+      <!-- show heading in uppercase -->
+      <!-- <h1>{{header.toLocaleUpperCase()}}</h1> -->
+
+      <!-- first way if header is not present then show welcome -->
+      <!-- <h1>{{header? header : 'welcome'}}</h1> -->
+
+      <!-- second way if header is not present then show welcome -->
+      <h1>{{header || 'welcome'}}</h1>
+
+      <!-- if and else condition using doEdit method....like if click to Add Item button 
+        then add to item and if click to cancle button then not show Add item input box -->
+      <button v-if="editing" @click="doEdit(false)" class="btn btn-cancle">
+        Cancle
+      </button>
+      <button v-else @click="doEdit(true)" class="btn btn-primary">
+        Add Item
+      </button>
+
+      <div v-if="editing" class="add-item-form">
+        <!-- add new item in shopping app using lazy modifiers -->
+
+        <input
+          @keyup.enter="saveItem"
+          v-model.lazy="newItem"
+          type="text"
+          placeholder="Add a item"
+        />
+
+        <!-- show counter like writing anything in input box of add a item.... for example = 20/200 -->
+        <p class="counter">{{characterCount}}/200</p>
+
+        <!-- show radio button of low and high priority -->
+        <!-- <label><input type="radio" v-model="newItemPriority" value="low">Low</label>
+        <label><input type="radio" v-model="newItemPriority" value="high">High</label> -->
+
+        <!-- show dropdown of low and high priority -->
+        <!-- <label>
+            Priority
+            <select v-model="newItemPriority">
+                <option value="low">Low</option>
+                <option value="high">High</option>
+            </select>
+        </label> -->
+
+        <label>
+          <!-- checkbox for high Priority -->
+          <input type="checkbox" v-model="newItemHighPriority" /> High Priority
+        </label>
+
+        <!-- using :disabled... when write 5 character then after save item otherwise not save item -->
+        <button
+          :disabled="newItem.length < 5"
+          @click="saveItem"
+          class="btn btn-primary"
+        >
+          Save Item
+        </button>
+      </div>
+
+      <!-- add link using v-bind and in that paste any link and click n Dynamic link and open the website -->
+      <!-- <a v-bind:href="newItem">Dynamic Link</a> -->
+
+      <!-- show first this text with Add item button  -->
+      <p v-if="items.length === 0">Nice job! You've bought all your items!</p>
+
+      <br />
+
+      <!-- for add item area -->
+      <!-- {{newItem}} -->
+
+      <!-- for low and high priority -->
+      <!-- {{newItemPriority}} -->
+
+      <!-- for high priority -->
+      <!-- {{newItemHighPriority}} -->
+
+      <!-- <label><input type="checkbox" v-model="iceCreamFlavors" value="vanilla">Vanilla</label>
+        <label><input type="checkbox" v-model="iceCreamFlavors" value="chocolate">Chocolate</label>
+        <label><input type="checkbox" v-model="iceCreamFlavors" value="strawberry">Strawberry</label>
+        <label><input type="checkbox" v-model="iceCreamFlavors" value="cookies & cream">Cookies & Cream</label> -->
+
+      <ul>
+        <!-- show all items using key -->
+        <!--strickout:  use strickout if item is purchased then show 
+            line on item means that item has crossed (not avaiable or already purchased)
+            using togglePurchased function (in method) and (now given staticly purchased is true or false)
+        if true then show line and not pucharse then show properly -->
+        <!--highPriority: if i click high priority checkbox then that item show in orange color 
+        now give staticly.. which item have high priority or not  -->
+        <li
+          v-for="item in items"
+          @click="togglePurchased(item)"
+          :key="item.id"
+          :class="{strikeout:item.purchased, priority:item.highPriority}"
+          class="static-class"
+        >
+          {{item.label}}
+        </li>
+
+        <!-- <li
+        v-for="item in items"
+        :key="item.id"
+        :class="[
+            {strikeout: item.purchased},
+            {priority: item.highPriority},
+            'static-class'
+        ]"
+        class="static-class"
+      >
+        {{item.label}}
+      </li> -->
+
+        <!-- another way but above is good  -->
+        <!-- <li v-for="{id, label} in items" :key="id">{{label}}</li> -->
+
+        <!-- with 0,1,2.... index number -->
+        <!-- <li v-for="(item, index) in items" :key="item.id">{{index}} {{item.label}}</li> -->
+
+        <!-- with iteam-1 cups,item-2 games..... -->
+        <!-- <li v-for="(item, key) in items" :key="item.id">{{key}} {{item.label}}</li> -->
+      </ul>
+      <!-- <input v-model="header"> -->
+    </div>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script>
+      const shoppingList = Vue.createApp({
+        data() {
+          return {
+            // how header
+            header: "Shopping List App",
+
+            editing: false,
+
+            //show all items
+            newItem: "",
+
+            //for low and high
+            // newItemPriority : 'low',
+
+            //for checkbox
+            newItemHighPriority: false,
+
+            // for all flavors checkbox
+            // iceCreamFlavors : [],
+
+            //show all item with item name
+            items: [
+              {
+                id: 1,
+                label: "10 party hats",
+                purchased: true, // for strikeout (with line)
+                highPriority: false, //for priority (not in orange color)
+              },
+              {
+                id: 2,
+                label: "2 board games",
+                purchased: true,
+                highPriority: false,
+              },
+              { 
+                id: 3, 
+                label: "20 cups", 
+                purchased: false, 
+                highPriority: true  // for priority (show in orange color)
+            },
+            ],
+
+            // show items with items number like iteam-1 cups,item-2 games....
+            //     items:{
+            //    ' item-1 ': {id:1, label:  "10 party hats"},
+            //    ' item-2 ': {id:2, label:  "2 board games"},
+            //    ' item-3 ': {id:3, label:  "20 cups"}
+            //     }
+          };
+        },
+
+        //for count character when writing in input text area of add a item
+        computed:{
+            CharacterCount(){
+                return this.newItem.length
+            }
+        },
+
+
+        //for only write one time logic in method using function then only used function name for all place
+        methods: {
+          saveItem() {
+            this.items.push({ id: this.items.length + 1, label: this.newItem, highPriority: this.newItemHighPriority });
+            this.newItem = "";
+            newItemHighPriority = "";
+          },
+
+          //create function for add item when click to Add item button
+          doEdit(editing) {
+            this.editing = editing;
+            this.newItem = "";
+            newItemHighPriority ="";
+          },
+
+          togglePurchased(item){
+            item.purchased = !item.purchased
+          }
+        },
+      }).mount("#shopping-list");
+    </script>
+  </body>
+</html>
+
+<!-- When shoppingList.items.push({id:4, label:"Hello!"}) is executed, 
+    it adds a new object {id:4, label:"Hello!"} 
+    to the items array in the shoppingList instance. -->
+
+<!-- When shoppingList.items.pop() is executed, 
+    it removes the last item from the 
+    items array in the shoppingList instance. -->
